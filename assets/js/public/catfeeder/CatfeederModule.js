@@ -1,6 +1,6 @@
 angular
 .module('CatFeeder', ['ngMaterial', 'ngMessages','compareTo','ngAnimate','toastr','ui.router','ngSocketIo'])
-.constant('Application',{title:'CatFeeder',version:'0.1',mqtt:{server:'test.mosquitto.org'/*'88.182.70.4'*/,port:8080/*9001*/,path:'/'}})
+.constant('Application',{title:'CatFeeder',version:'0.1',mqtt:{server:/*'test.mosquitto.org'*/'192.168.0.21',port:/*8080*/1883,path:'/'}})
 .config(function ($stateProvider, $urlRouterProvider, $mdThemingProvider,$mdIconProvider) {
     console.log('Catfeeder configuration');
     $urlRouterProvider.otherwise('/dashboard');

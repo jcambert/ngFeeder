@@ -44,7 +44,10 @@
 
         service.publish = function(topic, payload) {
             if(!connected)return;
-            client.publish(topic,payload, {retain: true});
+            var msg= new mqtt.Message(payload);
+            msg.destinationName = topic;
+            client.send(msg);
+           
             $log.log('publish-Event sent '+ payload + ' with topic: ' + topic + ' ' + client);
         }
 

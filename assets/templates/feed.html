@@ -8,10 +8,15 @@
   <md-switch class="md-primary" md-no-ink aria-label="Donner à manger au chat" ng-model="manuel" ng-disabled="isrunning || isfeeding">
     Manuel 
   </md-switch>
-  <md-switch class="md-primary" md-no-ink aria-label="Ouvrir" ng-model="open" ng-disabled="isrunning || isfeeding">
-    Ouvrir {{steps}} pas
-  </md-switch>
-  <md-switch class="md-primary" md-no-ink aria-label="Fermer" ng-model="close" ng-disabled="isrunning || isfeeding">
-    Fermer {{steps}} pas 
-  </md-switch>
+   <section layout="row" layout-sm="row" layout-align="left center" layout-wrap>
+       <md-button class="md-raised md-primary" md-no-ink aria-label="Ouvrir" ng-click="open()" ng-disabled="isrunning || isfeeding">
+        Ouvrir {{steps}} pas
+    </md-button>
+    <md-button class="md-raised md-primary" md-no-ink aria-label="Fermer" ng-click="close()" ng-disabled="isrunning || isfeeding">
+        Fermer {{steps}} pas 
+    </md-button>
+    <md-button class="md-raised md-primary" md-no-ink aria-label="Fermer" ng-click="reset()" ng-disabled="isrunning || isfeeding">
+        Reset
+    </md-button>
+   </section>
 </md-content>

@@ -3,10 +3,10 @@ angular.module('CatFeeder')
     toastr.success('Feed the Cat!!');
     $scope.seconds=5;
     $scope.steps=10;
-    $scope.autofeed=$scope.open=$scope.close=false;
+    $scope.autofeed=$scope.open=$scope.close=$scope.manuel=false;
     $scope.elapsed=0;
     
-   /* mqttSocket.onConnect(function(){
+    mqttSocket.onConnect(function(){
        mqttSocket.subscribe('feeder/isfeeding',function(message){
            $log.log('Message from feeder/isfeeding:');$log.log(message);
            $scope.isfeeding=(message.payloadString=='0x01');
@@ -15,7 +15,7 @@ angular.module('CatFeeder')
        //mqttSocket.publish('feeder/isfeed','');
     });
     mqttSocket.connect(app.mqtt.server,app.mqtt.port,app.mqtt.path,randomClientId());
-    */
+    
     feederSocket.on('feeder/isfeeding',function(message){
         $log.log('Message from feeder/isfeeding:');$log.log(message);
         $scope.isfeeding=(message.payloadString=='0x01');
@@ -35,8 +35,9 @@ angular.module('CatFeeder')
 
         if($scope.autofeed){
             $scope.isrunning=true;
-            //mqttSocket.publish('feeder/autofeed','');
-            feederSocket.emit('feeder/autofeed');
+            toastr.success('Auto feeding');
+            mqttSocket.publish('feeder/autofeed','');
+            //feederSocket.emit('feeder/autofeed');
             stop=$interval(function(){
                 $scope.elapsed+=1;
                 if($scope.elapsed==$scope.seconds)stopfeeding();
@@ -48,8 +49,26 @@ angular.module('CatFeeder')
     });
     
     $scope.$watch('manuel',function(){
-        
+        if($scope.manuel){
+            toastr.success('Start Feed Manuel');
+            mqttSocket.publish('feeder/feed','');
+        }else{
+            toastr.success('Stop Feed Manuel');
+            mqttSocket.publish('feeder/notfeed','');
+        }
     });
+    
+    $scope.open = function () {
+        mqttSocket.publish('feeder/open','');
+    }
+    
+    $scope.close = function(){
+        mqttSocket.publish('feeder/close','');
+    }
+    
+    $scope.reset = function(){
+        mqttSocket.publish('feeder/reset','');
+    }
     
     feederSocket.emit('feeder/isfeed');
 }])
