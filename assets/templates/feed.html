@@ -1,0 +1,17 @@
+<md-content ng-controller="FeedController " layout="column" layout-align="left left">
+    <h2 class="md-title"ng-show="isrunning || isfeeding">Je donne a manger.</h2>
+    <p ng-show="isrunning && !manuel"> Temps restant:{{seconds-elapsed}}sec Pourcentage:{{elapsed/seconds*100}}%</p>
+   <md-progress-linear md-mode="determinate" value="{{elapsed/seconds*100}}" ng-show="isrunning"></md-progress-linear>
+   <md-switch class="md-primary" md-no-ink aria-label="Donner à manger au chat" ng-model="autofeed" ng-disabled="isrunning || isfeeding">
+    Automatique (ouverture de {{seconds}} secondes)
+  </md-switch>
+  <md-switch class="md-primary" md-no-ink aria-label="Donner à manger au chat" ng-model="manuel" ng-disabled="isrunning || isfeeding">
+    Manuel 
+  </md-switch>
+  <md-switch class="md-primary" md-no-ink aria-label="Ouvrir" ng-model="open" ng-disabled="isrunning || isfeeding">
+    Ouvrir {{steps}} pas
+  </md-switch>
+  <md-switch class="md-primary" md-no-ink aria-label="Fermer" ng-model="close" ng-disabled="isrunning || isfeeding">
+    Fermer {{steps}} pas 
+  </md-switch>
+</md-content>
