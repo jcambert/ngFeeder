@@ -60,16 +60,28 @@ angular.module('CatFeeder')
     
     $scope.open = function () {
         mqttSocket.publish('feeder/open','');
-    }
+    };
     
     $scope.close = function(){
         mqttSocket.publish('feeder/close','');
-    }
+    };
     
     $scope.reset = function(){
         mqttSocket.publish('feeder/reset','');
-    }
+    };
     
+    
+    $scope.test = function(){
+        io.socket.get('/feed/auto', function(data, response) {
+            console.dir(response);
+            console.dir(response);
+        });
+    };
+    
+    io.socket.on('autofeed', function gotHelloMessage (data) {
+        console.log('Socket `' + data.id + '` joined the party!');
+    });
+
     feederSocket.emit('feeder/isfeed');
 }])
 

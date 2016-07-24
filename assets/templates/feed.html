@@ -8,6 +8,9 @@
   <md-switch class="md-primary" md-no-ink aria-label="Donner à manger au chat" ng-model="manuel" ng-disabled="isrunning || isfeeding">
     Manuel 
   </md-switch>
+  <md-button class="md-raised md-primary" md-no-ink aria-label="Fermer" ng-click="test()" ng-disabled="isrunning || isfeeding">
+        test
+</md-button>
    <section layout="row" layout-sm="row" layout-align="left center" layout-wrap>
        <md-button class="md-raised md-primary" md-no-ink aria-label="Ouvrir" ng-click="open()" ng-disabled="isrunning || isfeeding">
         Ouvrir {{steps}} pas
