@@ -1,20 +1,66 @@
 angular.module('CatFeeder')
-.controller('FeedController',['$log','$scope','toastr','$interval','Application','mqttSocket','randomClientId','feederSocket',function($log,$scope,toastr,$interval,app,mqttSocket,randomClientId,feederSocket){
+.controller('FeedController',['$log','$rootScope','$scope','toastr','$interval','Application','mqttSocket','randomClientId','feederSocket','$mdDialog','$mdMedia','Settings',function($log,$rootScope,$scope,toastr,$interval,app,mqttSocket,randomClientId,feederSocket,$mdDialog,$mdMedia,Settings){
     toastr.success('Feed the Cat!!');
     $scope.seconds=5;
     $scope.steps=10;
-    $scope.autofeed=$scope.open=$scope.close=$scope.manuel=false;
+    //$scope.autofeed=$scope.open=$scope.close=false;
     $scope.elapsed=0;
+    //$scope.mode=Settings.mode;
+  
     
-    mqttSocket.onConnect(function(){
-       mqttSocket.subscribe('feeder/isfeeding',function(message){
-           $log.log('Message from feeder/isfeeding:');$log.log(message);
-           $scope.isfeeding=(message.payloadString=='0x01');
-           $scope.$apply();
-       });
-       //mqttSocket.publish('feeder/isfeed','');
+    $rootScope.$on('$sailsResourceUpdated', function(event, message) {
+        if(message.model == 'setting') {
+            console.dir('Setting has changed');
+            $scope.apply();
+            applySettings();
+        }
     });
-    mqttSocket.connect(app.mqtt.server,app.mqtt.port,app.mqtt.path,randomClientId());
+    
+    function applySettings(){
+        
+            //$scope.mode=message.data.mode;
+           if(!Settings.mode){
+               //use socketio
+               useSocketIo();
+           }else{
+               //use mqtt
+               useMqtt();
+           }
+        
+    }
+    function useSocketIo(){
+        $log.log('Use Socket Io');
+        io.socket.on('autofeed', function gotHelloMessage (data) {
+            console.dir(data);
+            console.log('Socket `' + data.id + '` joined the party!');
+        });
+    }
+    
+    function useMqtt(){
+       $log.log('use Mqtt');
+       mqttSocket.onConnect(function(){
+            mqttSocket.subscribe('feeder/isfeeding',function(message){
+                $log.log('Message from feeder/isfeeding:');$log.log(message);
+                $scope.isfeeding=(message.payloadString=='0x01');
+                $scope.$apply();
+            });
+       //mqttSocket.publish('feeder/isfeed','');
+        });
+        mqttSocket.connect(app.mqtt.server,app.mqtt.port,app.mqtt.path,randomClientId());
+    }
+  
+    function send(action){
+        var msg='feeder/'+action;
+        console.dir(msg);
+        if(!Settings.mode){
+             io.socket.get(action, function(data, response) {
+                console.dir(response);
+                //console.dir(response);
+            });
+        }else{
+            mqttSocket.publish(action,'');
+        }
+    }
     
     feederSocket.on('feeder/isfeeding',function(message){
         $log.log('Message from feeder/isfeeding:');$log.log(message);
@@ -36,7 +82,7 @@ angular.module('CatFeeder')
         if($scope.autofeed){
             $scope.isrunning=true;
             toastr.success('Auto feeding');
-            mqttSocket.publish('feeder/autofeed','');
+            send('autofeed');
             //feederSocket.emit('feeder/autofeed');
             stop=$interval(function(){
                 $scope.elapsed+=1;
@@ -51,38 +97,34 @@ angular.module('CatFeeder')
     $scope.$watch('manuel',function(){
         if($scope.manuel){
             toastr.success('Start Feed Manuel');
-            mqttSocket.publish('feeder/feed','');
+            send('feed');
         }else{
             toastr.success('Stop Feed Manuel');
-            mqttSocket.publish('feeder/notfeed','');
+            send('notfeed');
         }
     });
     
     $scope.open = function () {
-        mqttSocket.publish('feeder/open','');
+        send('open');
     };
     
     $scope.close = function(){
-        mqttSocket.publish('feeder/close','');
+        send('close');
     };
     
     $scope.reset = function(){
-        mqttSocket.publish('feeder/reset','');
+        send('reset');
     };
     
     
     $scope.test = function(){
-        io.socket.get('/feed/auto', function(data, response) {
-            console.dir(response);
-            console.dir(response);
-        });
+        send('auto');
     };
     
-    io.socket.on('autofeed', function gotHelloMessage (data) {
-        console.log('Socket `' + data.id + '` joined the party!');
-    });
-
-    feederSocket.emit('feeder/isfeed');
+    
+    
+    applySettings();
+    
 }])
 
 ;

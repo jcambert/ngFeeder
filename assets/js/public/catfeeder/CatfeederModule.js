@@ -1,5 +1,5 @@
 angular
-.module('CatFeeder', ['ngMaterial', 'ngMessages','compareTo','ngAnimate','toastr','ui.router','ngSocketIo'])
+.module('CatFeeder', ['ngMaterial', 'ngMessages','compareTo','ngAnimate','toastr','ui.router','ngSocketIo','sailsResource'])
 .constant('Application',{title:'CatFeeder',version:'0.1',mqtt:{server:/*'test.mosquitto.org'*/'192.168.0.21',port:/*8080*/1883,path:'/'}})
 .config(function ($stateProvider, $urlRouterProvider, $mdThemingProvider,$mdIconProvider) {
     console.log('Catfeeder configuration');
@@ -74,9 +74,42 @@ angular
   return rndClientId;
 })
 .factory('feederSocket',function(socketFactory){return socketFactory();})
-.run(function($rootScope,$state,Application) {
+.service('Settings',['sailsResource','$rootScope',function(sailsResource){
+    var self=this;
+      
+      var settings={};
+      
+    
+    self.settings=function(){return settings;}
+    self.setSettings=function(s){
+        console.dir(s);
+        settings=s;
+    }
+    self.load=function(res){
+        if(res){
+            res('Setting').query(function(items){
+                settings=items[0] || {};
+                //console.dir(settings);
+            });
+            
+            
+        }
+        
+    };
+    self.save=function(res){
+       // console.dir(settings);
+        settings.$save();
+    };
+    
+  
+         
+}])
+
+.run(function($rootScope,$state,Application,Settings,sailsResource) {
     console.log('Catfeeder running ..');
+    Settings.load(sailsResource);
     $rootScope.app=Application;
     $state.go('home.dashboard');
+    
 })
 ;

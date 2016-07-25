@@ -1,4 +1,6 @@
 <md-content ng-controller="FeedController " layout="column" layout-align="left left">
+    <p ng-show="!settings.mode">J'utilise SocketIo'</p>
+    <p ng-show="settings.mode">J'utilise Mqtt'</p>
     <h2 class="md-title"ng-show="isrunning || isfeeding">Je donne a manger.</h2>
     <p ng-show="isrunning && !manuel"> Temps restant:{{seconds-elapsed}}sec Pourcentage:{{elapsed/seconds*100}}%</p>
    <md-progress-linear md-mode="determinate" value="{{elapsed/seconds*100}}" ng-show="isrunning"></md-progress-linear>
