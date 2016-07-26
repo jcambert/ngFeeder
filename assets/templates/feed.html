@@ -1,18 +1,14 @@
 <md-content ng-controller="FeedController " layout="column" layout-align="left left">
-    <p ng-show="!settings.mode">J'utilise SocketIo'</p>
-    <p ng-show="settings.mode">J'utilise Mqtt'</p>
+    
     <h2 class="md-title"ng-show="isrunning || isfeeding">Je donne a manger.</h2>
     <p ng-show="isrunning && !manuel"> Temps restant:{{seconds-elapsed}}sec Pourcentage:{{elapsed/seconds*100}}%</p>
    <md-progress-linear md-mode="determinate" value="{{elapsed/seconds*100}}" ng-show="isrunning"></md-progress-linear>
-   <md-switch class="md-primary" md-no-ink aria-label="Donner à manger au chat" ng-model="autofeed" ng-disabled="isrunning || isfeeding">
+   <md-switch class="md-primary" md-no-ink aria-label="Donner à manger au chat"  ng-change="onAutoChange(autofeed)" ng-model="autofeed" ng-disabled="isrunning || isfeeding">
     Automatique (ouverture de {{seconds}} secondes)
   </md-switch>
-  <md-switch class="md-primary" md-no-ink aria-label="Donner à manger au chat" ng-model="manuel" ng-disabled="isrunning || isfeeding">
+  <md-switch class="md-primary" ng-change="onManuelChange(manuel)" md-no-ink aria-label="Donner à manger au chat" ng-model="manuel" ng-disabled="isrunning || isfeeding">
     Manuel 
   </md-switch>
-  <md-button class="md-raised md-primary" md-no-ink aria-label="Fermer" ng-click="test()" ng-disabled="isrunning || isfeeding">
-        test
-</md-button>
    <section layout="row" layout-sm="row" layout-align="left center" layout-wrap>
        <md-button class="md-raised md-primary" md-no-ink aria-label="Ouvrir" ng-click="open()" ng-disabled="isrunning || isfeeding">
         Ouvrir {{steps}} pas
