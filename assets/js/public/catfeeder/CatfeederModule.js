@@ -1,6 +1,6 @@
 angular
 .module('CatFeeder', ['ngMaterial', 'ngMessages','compareTo','ngAnimate','toastr','ui.router','ngSails','sailsResource'])
-.constant('Application',{title:'CatFeeder',version:'0.1',mqtt:{server:/*'test.mosquitto.org'*/'192.168.0.21',port:/*8080*/1883,path:'/'}})
+.constant('Application',{title:'CatFeeder',version:'0.1'})
 .config(function ($stateProvider, $urlRouterProvider, $mdThemingProvider,$mdIconProvider) {
     console.log('Catfeeder configuration');
     $urlRouterProvider.otherwise('/dashboard');
@@ -74,7 +74,7 @@ angular
   return rndClientId;
 })
 //.factory('feederSocket',function(socketFactory){return socketFactory();})
-/*.service('Settings',['sailsResource','$rootScope',function(sailsResource){
+.service('Settings',['sailsResource','$rootScope',function(sailsResource,$rootScope){
     var self=this;
       
       var settings={};
@@ -82,9 +82,22 @@ angular
     
     self.settings=function(){return settings;}
     self.setSettings=function(s){
-        console.dir(s);
-        settings=s;
-    }
+    
+        var Item = sailsResource('setting');
+        settings = new Item();
+        //settings.seconds=10;
+        angular.forEach(s,function(value,key){
+            settings[key]=value;
+        });
+        console.dir(settings);
+    };
+    self.getSettings = function(){
+        var res={};
+        angular.forEach(_.keys(settings),function(key){
+            res[key]=settings[key];
+        });
+        return res;
+    };
     self.load=function(res){
         if(res){
             res('Setting').query(function(items){
@@ -103,13 +116,13 @@ angular
     
   
          
-}])*/
+}])
 
-.run(function($rootScope,$state,Application/*,Settings*/,sailsResource) {
+.run(['$rootScope','$state','Application','Settings','sailsResource',function($rootScope,$state,Application,Settings,sailsResource) {
     console.log('Catfeeder running ..');
-   // Settings.load(sailsResource);
+    Settings.load(sailsResource);
     $rootScope.app=Application;
     $state.go('home.dashboard');
     
-})
+}])
 ;

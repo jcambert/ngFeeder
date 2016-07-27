@@ -34,6 +34,15 @@ module.exports = {
         if (!req.isSocket || (req.method!='POST')) {return res.badRequest();}
         MqttService.publish('feeder','close');
         return res.ok();
+    },
+    reset:function(req,res){
+        if (!req.isSocket) {return res.badRequest();}
+        
+    },
+    register:function(req,res){
+        //if (!req.isSocket || (req.method!='GET')) {return res.badRequest();}
+        sails.sockets.join(req,'feeder');
+        return res.json({id:sails.sockets.getId(req)});
     }
 };
 MqttService.on('disconnect',function(){
@@ -49,7 +58,7 @@ function request(req,res,from) {
     // console.dir(sails.sockets);
     sails.log (sails.sockets.getId(req));
     
-    sails.sockets.join(req,'feeder');
+    
     
     MqttService.publish('feeder',from);
     

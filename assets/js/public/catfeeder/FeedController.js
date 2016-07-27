@@ -1,96 +1,118 @@
 angular.module('CatFeeder')
-.controller('FeedController',['$log','$rootScope','$scope','toastr','$interval','$timeout','Application','mqttSocket','randomClientId','$sails','$mdDialog','$mdMedia'/*,'Settings'*/,function($log,$rootScope,$scope,toastr,$interval,$timeout,app,mqttSocket,randomClientId,$sails,$mdDialog,$mdMedia/*,Settings*/){
+.controller('FeedController',
+['$log','$rootScope','$scope','toastr','$interval','$timeout','Application','mqttSocket',
+'randomClientId','$sails','$mdDialog','$mdMedia','Settings',
+function($log,$rootScope,$scope,toastr,$interval,$timeout,app,mqttSocket,
+        randomClientId,$sails,$mdDialog,$mdMedia,Settings){
+            
     //toastr.success('Feed the Cat!!');
-    $scope.seconds=5;
-    $scope.steps=10;
+    $scope.seconds=Number(Settings.getSettings().seconds) || 5;
+    $scope.steps=Number(Settings.getSettings().steps) || 10;
     $scope.autofeed=$scope.open=$scope.close=false;
     $scope.elapsed=0;
     //$scope.mode=Settings.mode;
-  
+    //$scope.running=false;
+    $scope.isme=true;
+    $scope.me=undefined;
+    $scope.connected=false;
     
+    $rootScope.$on('$sailsResourceUpdated', function(event, message) {
+        if(message.model == 'setting') {
+             $scope.seconds=Number(Settings.getSettings().seconds);
+             $scope.steps=Number(Settings.getSettings().steps);
+             //$scope.$apply();
+        }
+    });
+
     function feed(){
+       // if($scope.running)return;
+        $scope.running=true;
         $sails.get('/feeder/feed')
         .success(function(data, status, headers, jwr){
-            console.dir(data);
-        })
-        .error(function(data, status, headers, jwr){
-            console.dir(data);
-        });
-    };
-    
-    function notfeed(){
-        $sails.get('/feeder/notfeed')
-        .success(function(data, status, headers, jwr){
-            console.dir(data);
+            $log.log(data);
+            //$scope.running=false;
         })
         .error(function(data, status, headers, jwr){
             toastr.error(data);
+            //$scope.running=false;
+        });
+       
+    };
+    
+    function notfeed(){
+        //$scope.running=true;
+        $sails.get('/feeder/notfeed')
+        .success(function(data, status, headers, jwr){
+            $log.log(data);
+            //$scope.running=false;
+        })
+        .error(function(data, status, headers, jwr){
+            toastr.error(data);
+            //$scope.running=false;
             //console.dir(resp);
         });
     };
     
     function open(){
+        //if($scope.running)return;
+       // $scope.running=true;
         $sails.post('/feeder/open',{steps:10})
         .success(function(data, status, headers, jwr){
-            console.dir(data);
+            $log.log(data);
+            //$scope.running=false;
         })
         .error(function(data, status, headers, jwr){
             toastr.error(data);
+            //$scope.running=false;
             //console.dir(resp);
         });
     }
     
     function close(){
+        //if($scope.running)return;
+        //$scope.running=true;
          $sails.post('/feeder/close',{steps:10})
         .success(function(data, status, headers, jwr){
-            console.dir(data);
+            $log.log(data);
+           // $scope.running=false;
         })
         .error(function(data, status, headers, jwr){
             toastr.error(data);
+            //$scope.running=false;
             //console.dir(resp);
         });
     }
     
     function reset(){
+        //if($scope.running)return;
+         //$scope.running=true;
          $sails.get('/feeder/reset')
         .success(function(data, status, headers, jwr){
-            console.dir(data);
+            $log.log(data);
+            //$scope.running=false;
         })
         .error(function(data, status, headers, jwr){
             toastr.error(data);
-            //console.dir(resp);
+           //$scope.running=false;
         });
     }
-  /*  feederSocket.on('feeder/isfeeding',function(message){
-        $log.log('Message from feeder/isfeeding:');$log.log(message);
-        $scope.isfeeding=(message.payloadString=='0x01');
-        $scope.$apply();
-    })*/
-    $scope.$$postDigest(function(){
-        $scope.$watch('autofeed',function(){
-            
-        });
-        
-        $scope.$watch('manuel',function(){
-           
-        });
-    });
+
     
     $scope.onAutoChange = function(state){
         var stop=undefined;
         var stopfeeding=function(){
             if (angular.isDefined(stop)) {
-            $interval.cancel(stop);
-            notfeed();
-            stop = undefined;
-        }
-        
-        $scope.autofeed=false;
-        $scope.isrunning=false;
+                $interval.cancel(stop);
+                notfeed();
+                stop = undefined;
+            }
+            
+            $scope.autofeed=false;
+            $scope.isautorun=false;
         }
 
         if($scope.autofeed){
-            $scope.isrunning=true;
+            $scope.isautorun=true;
             $scope.elapsed=0;
             feed();
             toastr.success('Auto feeding');
@@ -102,17 +124,19 @@ angular.module('CatFeeder')
             },1000);
             
         }else{
-            $scope.isrunning=false;
+            $scope.isautorun=false;
         }
     };
     
     $scope.onManuelChange = function(state) {
         if(state){
+            $scope.ismanualrun=true;
             feed();
             toastr.success('Start Feed Manuel');
         //   send('feed');
         }else{
             notfeed();
+            $scope.ismanualrun=false;
             toastr.success('Stop Feed Manuel');
         //send('notfeed');
         }
@@ -132,11 +156,15 @@ angular.module('CatFeeder')
     };
     
     
-    $sails.on('feed',function(){
+    $sails.on('feed',function(data){
+        checkIfIsMe(data.id);
+        //toastr.success(data);
         toastr.success('je donne a manger au chat');
     });
     
-    $sails.on('notfeed',function(){
+    $sails.on('notfeed',function(data){
+        checkIfIsMe($scope.me);
+        //toastr.success(data);
         toastr.success('J\'ai donné à manger au chat');
     });
     
@@ -147,6 +175,33 @@ angular.module('CatFeeder')
     $sails.on('mqtt_connect',function(){
         toastr.warn('Serveur MQTT Connecté');
     });
+    
+    
+    $sails.on('connect',function(){
+        register();
+    })
+    
+    $sails.on('disconnect',function(){
+        $scope.connected=false;
+        toastr.warning('Attention vous etes deconnecté du serveur');
+        
+    })
+    function register(){
+        $sails.get('/feeder/register')
+            .success(function(data, status, headers, jwr){
+                $log.log(data);
+                $scope.connected=true;
+                $scope.me=data.id;
+                //toastr.success('Bienvenue:'+$scope.me);
+            })
+            .error(function(data, status, headers, jwr){
+                toastr.error(data);
+                console.dir(status);
+            });
+    }
+    function checkIfIsMe(id){
+         $scope.isme=($scope.me==id) /*$scope.running*/;
+    }
     
    // applySettings();
     

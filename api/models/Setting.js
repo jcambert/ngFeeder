@@ -8,7 +8,14 @@
 module.exports = {
 
   attributes: {
-
+    steps:{
+        type:'integer',
+        required:true
+    },
+    seconds:{
+        type:'integer',
+        required:true
+    }
   }
 };
 

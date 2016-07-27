@@ -1,8 +1,8 @@
-<md-dialog aria-label="Mango (Fruit)"  ng-cloak>
-  <form>
+<md-dialog aria-label="Parametres"  ng-cloak>
+  <form name="settingsForm" novalidate>
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <h2>Parametres)</h2>
+        <h2>Parametres</h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>
@@ -11,12 +11,36 @@
     </md-toolbar>
     <md-dialog-content>
       <div class="md-dialog-content">
-         <p ng-show="!settings.mode">J'uitlise Socket.io</p>
-        <p ng-show="settings.mode">J'utilise' MQTT</p>
-         <md-switch class="md-primary" md-no-ink aria-label="Utiliser Socket" ng-model="settings.mode">
-            <p ng-show="settings.mode">Utiliser Socket.io</p>
-            <p ng-show="!settings.mode">Utiliser MQTT</p>
-        </md-switch>
+         <md-input-container class="md-block">
+            <label>Secondes d'ouverture Auto</label>
+            <input required type="number" step="any" name="seconds" ng-model="settings.seconds" min="1"  max="20"/>
+            <div ng-messages="settingsForm.seconds.$error" multiple md-auto-hide="false">
+            <div ng-message="required">
+               Vous devez entrer une valeur
+            </div>
+            <div ng-message="min">
+                le nombre de secondes doit etre > 0
+            </div>
+            <div ng-message="max">
+                le nombre de  seconde doit etre <21
+            </div>
+            </div>
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label>Pas d'ouverture manuel</label>
+            <input required type="number" step="any" name="steps" ng-model="settings.steps" min="1"  max="360"/>
+            <div ng-messages="settingsForm.steps.$error" multiple md-auto-hide="false">
+            <div ng-message="required">
+               Vous devez entrer une valeur
+            </div>
+            <div ng-message="min">
+                le nombre de secondes doit etre > 0
+            </div>
+            <div ng-message="max">
+                le nombre de  seconde doit etre <360
+            </div>
+            </div>
+        </md-input-container>
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row">

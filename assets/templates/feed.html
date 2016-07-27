@@ -1,22 +1,26 @@
-<md-content ng-controller="FeedController " layout="column" layout-align="left left">
-    
-    <h2 class="md-title"ng-show="isrunning || isfeeding">Je donne a manger.</h2>
-    <p ng-show="isrunning && !manuel"> Temps restant:{{seconds-elapsed}}sec Pourcentage:{{elapsed/seconds*100}}%</p>
-   <md-progress-linear md-mode="determinate" value="{{elapsed/seconds*100}}" ng-show="isrunning"></md-progress-linear>
-   <md-switch class="md-primary" md-no-ink aria-label="Donner à manger au chat"  ng-change="onAutoChange(autofeed)" ng-model="autofeed" ng-disabled="isrunning || isfeeding">
+<md-content ng-controller="FeedController " layout="column" layout-align="left left" ng-enable="isme" ng-show="connected">
+    <section ng-show="!isme">
+        Un autre personne utilise l'application
+    </section>
+    <section data-ng-show="isautorun">
+        <h2 class="md-title" >Je donne a manger.</h2>
+        <p>Temps restant:{{seconds-elapsed}} sec Pourcentage:{{elapsed/seconds*100 | number:0}}%</p>
+        <md-progress-linear md-mode="determinate" value="{{elapsed/seconds*100}}" ></md-progress-linear>
+    </section>
+   <md-switch class="md-primary" md-no-ink aria-label="Donner à manger au chat"  ng-change="onAutoChange(autofeed)" ng-model="autofeed" data-ng-hide="isautorun || ismanualrun || !isme">
     Automatique (ouverture de {{seconds}} secondes)
   </md-switch>
-  <md-switch class="md-primary" ng-change="onManuelChange(manuel)" md-no-ink aria-label="Donner à manger au chat" ng-model="manuel" ng-disabled="isrunning || isfeeding">
+  <md-switch class="md-primary" ng-change="onManuelChange(manuel)" md-no-ink aria-label="Donner à manger au chat" ng-model="manuel" data-ng-hide="isautorun || !isme">
     Manuel 
   </md-switch>
-   <section layout="row" layout-sm="row" layout-align="left center" layout-wrap>
-       <md-button class="md-raised md-primary" md-no-ink aria-label="Ouvrir" ng-click="open()" ng-disabled="isrunning || isfeeding">
+   <section layout="row" layout-sm="row" layout-align="left center" layout-wrap data-ng-hide="isautorun || ismanualrun">
+       <md-button class="md-raised md-primary" md-no-ink aria-label="Ouvrir" ng-click="open()" data-ng-hide="!isme">
         Ouvrir {{steps}} pas
     </md-button>
-    <md-button class="md-raised md-primary" md-no-ink aria-label="Fermer" ng-click="close()" ng-disabled="isrunning || isfeeding">
+    <md-button class="md-raised md-primary" md-no-ink aria-label="Fermer" ng-click="close()"  data-ng-hide="!isme">
         Fermer {{steps}} pas 
     </md-button>
-    <md-button class="md-raised md-primary" md-no-ink aria-label="Fermer" ng-click="reset()" ng-disabled="isrunning || isfeeding">
+    <md-button class="md-raised md-primary" md-no-ink aria-label="Fermer" ng-click="reset()"  data-ng-hide="!isme">
         Reset
     </md-button>
    </section>
