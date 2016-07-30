@@ -45,10 +45,13 @@ module.exports = {
         return res.json({id:sails.sockets.getId(req)});
     }
 };
-MqttService.on('disconnect',function(){
+MqttService.on('disconnect',function(err){
+    sails.log.warning('Mqtt Disconnected');
+    sails.log.warning(err);
     sails.sockets.broadcast('feeder','mqtt_disconnect',{});
 });
 MqttService.on('connect',function(){
+    sails.log.info('Mqtt connected');
     sails.sockets.broadcast('feeder','mqtt_connect',{});
 });
 function request(req,res,from) {

@@ -1,4 +1,4 @@
 module.exports.mqtt = {
-    server:'test.mosquitto.org',
-    port:'1883'
+    server:'192.168.0.21',
+    port:'9001'
 }

@@ -173,7 +173,7 @@ function($log,$rootScope,$scope,toastr,$interval,$timeout,app,mqttSocket,
     });
     
     $sails.on('mqtt_connect',function(){
-        toastr.warn('Serveur MQTT Connecté');
+        toastr.success('Serveur MQTT Connecté');
     });
     
     
@@ -192,7 +192,7 @@ function($log,$rootScope,$scope,toastr,$interval,$timeout,app,mqttSocket,
                 $log.log(data);
                 $scope.connected=true;
                 $scope.me=data.id;
-                //toastr.success('Bienvenue:'+$scope.me);
+                toastr.success('Bienvenue:'+$scope.me);
             })
             .error(function(data, status, headers, jwr){
                 toastr.error(data);

@@ -9,8 +9,15 @@ client.on('connect', function () {
 
 var MqttService = {  
   publish: function (to,what) {
-    sails.log('Publish to Mosquitto:'+to+'/'+what);
-    client.publish(to,what);
+    sails.log.info('Publish to Mqtt:'+to+'/'+what);
+    /*client.publish({
+        topic: to
+      , payload: what
+      , qos: 0
+      });*/
+    client.publish(to+'/'+what,'',0,function(){
+        sails.log.info('published');
+    });
   },
   subscribe:function(to){
       client.subscribe(to);
