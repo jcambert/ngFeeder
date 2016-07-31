@@ -1,7 +1,7 @@
 angular
 .module('CatFeeder', ['ngMaterial', 'ngMessages','compareTo','ngAnimate','toastr','ui.router','ngSails','sailsResource'])
 .constant('Application',{title:'CatFeeder',version:'0.1'})
-.config(function ($stateProvider, $urlRouterProvider, $mdThemingProvider,$mdIconProvider) {
+.config(['$stateProvider', '$urlRouterProvider', '$mdThemingProvider','$mdIconProvider',function ($stateProvider, $urlRouterProvider, $mdThemingProvider,$mdIconProvider) {
     console.log('Catfeeder configuration');
     $urlRouterProvider.otherwise('/dashboard');
     $stateProvider
@@ -56,8 +56,8 @@ angular
       'A400': '#E75753',
       'A700': '#E75753'
     });
-})
-.service('randomClientId',function(){
+}])
+.service('randomClientId',[function(){
     var lut = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16); }
 
     function rndClientId()
@@ -72,7 +72,7 @@ angular
       lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
   }
   return rndClientId;
-})
+}])
 //.factory('feederSocket',function(socketFactory){return socketFactory();})
 .service('Settings',['sailsResource','$rootScope',function(sailsResource,$rootScope){
     var self=this;

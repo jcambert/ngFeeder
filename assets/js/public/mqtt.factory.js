@@ -1,4 +1,4 @@
-(function(angular,mqtt) {
+/*(function(angular,mqtt) {
   'use strict';
   angular
   .module('CatFeeder')
@@ -78,3 +78,4 @@
   })
 })(angular,Paho.MQTT);
 
+*/

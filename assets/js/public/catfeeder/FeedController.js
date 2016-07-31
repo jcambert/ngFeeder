@@ -1,8 +1,8 @@
 angular.module('CatFeeder')
 .controller('FeedController',
-['$log','$rootScope','$scope','toastr','$interval','$timeout','Application','mqttSocket',
+['$log','$rootScope','$scope','toastr','$interval','$timeout','Application',
 'randomClientId','$sails','$mdDialog','$mdMedia','Settings',
-function($log,$rootScope,$scope,toastr,$interval,$timeout,app,mqttSocket,
+function($log,$rootScope,$scope,toastr,$interval,$timeout,app,
         randomClientId,$sails,$mdDialog,$mdMedia,Settings){
             
     //toastr.success('Feed the Cat!!');
