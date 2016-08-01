@@ -86,7 +86,7 @@ function($log,$rootScope,$scope,toastr,$interval,$timeout,app,
     function reset(){
         //if($scope.running)return;
          //$scope.running=true;
-         $sails.get('/feeder/reset')
+         $sails.post('/feeder/reset')
         .success(function(data, status, headers, jwr){
             $log.log(data);
             //$scope.running=false;

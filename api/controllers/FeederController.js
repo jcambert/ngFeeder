@@ -37,6 +37,8 @@ module.exports = {
     },
     reset:function(req,res){
         if (!req.isSocket) {return res.badRequest();}
+         MqttService.publish('feeder','reset');
+         return res.ok();
         
     },
     register:function(req,res){
